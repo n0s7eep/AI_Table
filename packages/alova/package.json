@@ -1,0 +1,22 @@
+{
+  "name": "@aitable/alova",
+  "version": "1.3.11",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./fetch": "./src/fetch.ts",
+    "./client": "./src/client.ts",
+    "./mock": "./src/mock.ts"
+  },
+  "typesVersions": {
+    "*": {
+      "*": ["./src/*"]
+    }
+  },
+  "dependencies": {
+    "@alova/mock": "2.0.11",
+    "@aitable/utils": "*",
+    "alova": "3.2.8"
+  }
+}

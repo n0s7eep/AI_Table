@@ -1,0 +1,30 @@
+{
+  "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
+  "include": [
+    "src/renderer/src/env.d.ts",
+    "src/renderer/src/**/*",
+    "src/renderer/src/**/*.ts",
+    "src/renderer/src/**/*.tsx",
+    "src/renderer/src/**/*.vue",
+    "src/preload/*.d.ts",
+    "src/renderer/**/*.d.ts",
+    "build/typings/env.d.ts"
+, "build/typings/app.d.ts", "build/typings/union-key.d.ts", "build/typings/elegant-router.d.ts"  ],
+  "compilerOptions": {
+    "composite": true,
+    "jsxImportSource": "vue",
+    "strictNullChecks": true,
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@renderer/*": [
+        "src/renderer/src/*"
+      ],
+      "@/*": [
+        "src/renderer/src/*"
+      ]
+    },
+    "types": ["vite/client", "node", "unplugin-icons/types/vue", "naive-ui/volar"],
+  },
+  "exclude": ["node_modules", "dist"]
+}

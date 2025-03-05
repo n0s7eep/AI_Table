@@ -1,9 +1,8 @@
 {
-  "include": ["vite.config.*"],
+  "extends": "@electron-toolkit/tsconfig/tsconfig.node.json",
+  "include": ["electron.vite.config.*", "src/main/**/*", "src/preload/**/*", "build/typings/**/*", "build/plugins/**/*", "build/config/**/*"],
   "compilerOptions": {
     "composite": true,
-    "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "types": ["node"]
+    "types": ["electron-vite/node"]
   }
 }

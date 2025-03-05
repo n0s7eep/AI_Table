@@ -1,0 +1,23 @@
+{
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "i18n-ally.enabledFrameworks": [
+    "vue"
+  ],
+  "i18n-ally.enabledParsers": [
+    "ts",
+    "json"
+  ],
+  "i18n-ally.localesPaths": [
+    "src/renderer/src/locales/langs",
+  ],
+  "i18n-ally.sourceLanguage": "zh-cn",
+  "i18n-ally.keystyle": "nested"
+}
