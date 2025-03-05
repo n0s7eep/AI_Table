@@ -1,7 +1,15 @@
 import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
+import { exec } from 'child_process'
+import axios from 'axios'
 import icon from '../../resources/icon.png?asset'
+
+// 获取应用根目录
+const appRoot = app.getAppPath()
+
+// 设置conda环境名称
+const CONDA_ENV_NAME = 'metagpt'
 
 function createWindow(): void {
   // Create the browser window.
@@ -13,7 +21,8 @@ function createWindow(): void {
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
-      sandbox: false
+      sandbox: false,
+      contextIsolation: true
     }
   })
 
@@ -51,6 +60,80 @@ app.whenReady().then(() => {
 
   // IPC test
   ipcMain.on('ping', () => console.log('pong'))
+
+  // 启动 Flask 服务
+  const flaskScriptPath = join(appRoot, 'multiagent', 'startup.py')
+  console.log('启动Flask服务，脚本路径:', flaskScriptPath)
+
+  // 检查文件是否存在
+  const fs = require('fs')
+  if (!fs.existsSync(flaskScriptPath)) {
+    console.error('Flask启动脚本不存在:', flaskScriptPath)
+    return
+  }
+
+  // 构建conda激活命令
+  let command = ''
+  if (process.platform === 'win32') {
+    // Windows下使用conda.bat
+    command = `conda activate ${CONDA_ENV_NAME} && python "${flaskScriptPath}"`
+  } else {
+    // Linux/Mac下使用conda
+    command = `source activate ${CONDA_ENV_NAME} && python3 "${flaskScriptPath}"`
+  }
+
+  console.log('执行命令:', command)
+
+  const flaskProcess = exec(
+    command,
+    {
+      shell: '/bin/bash', // 使用bash shell
+      env: {
+        ...process.env,
+        PYTHONPATH: join(appRoot, 'multiagent') // 设置PYTHONPATH
+      }
+    },
+    (error, stdout, stderr) => {
+      if (error) {
+        console.error(`启动 Flask 服务时出错: ${error.message}`)
+        console.error('错误详情:', error)
+        return
+      }
+      if (stderr) {
+        console.error(`Flask 服务错误输出: ${stderr}`)
+        return
+      }
+      console.log(`Flask 服务输出: ${stdout}`)
+    }
+  )
+
+  // 监听进程错误
+  flaskProcess.on('error', (err) => {
+    console.error('Flask进程错误:', err)
+  })
+
+  // 监听进程退出
+  flaskProcess.on('exit', (code) => {
+    console.log(`Flask进程退出，退出码: ${code}`)
+  })
+
+  // 定期检查服务健康状态
+  setInterval(async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/health')
+      console.log('服务健康状态:', response.data)
+      // 发送状态到渲染进程
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('service-health', response.data)
+      })
+    } catch (error) {
+      console.error('无法访问服务健康端点:', error)
+      // 发送错误状态到渲染进程
+      BrowserWindow.getAllWindows().forEach((window) => {
+        window.webContents.send('service-health', { status: 'error', message: error })
+      })
+    }
+  }, 60000) // 每60秒检查一次
 
   createWindow()
 
