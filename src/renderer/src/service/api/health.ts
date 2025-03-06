@@ -10,19 +10,18 @@ export interface HealthCheckResult {
 
 /** 健康检查接口 */
 export async function checkHealth(): Promise<HealthCheckResult> {
-  try {
-    const response = await axios.get('http://localhost:5000/api/health', {
-      timeout: 5000 // 5秒超时
+  return new Promise((resolve) => {
+    window.electron.ipcRenderer.invoke('get-service-health').then((status: HealthStatus) => {
+      resolve({
+        status,
+        success: status === 'healthy'
+      });
+    }).catch((error) => {
+      resolve({
+        status: 'unhealthy',
+        success: false,
+        error
+      });
     });
-    return {
-      status: response.status === 200 ? 'healthy' : 'unhealthy',
-      success: response.status === 200
-    };
-  } catch (error) {
-    return {
-      status: 'unhealthy',
-      success: false,
-      error
-    };
-  }
+  });
 }
