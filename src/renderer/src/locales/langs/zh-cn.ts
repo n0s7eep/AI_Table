@@ -9,10 +9,18 @@ const local: App.I18n.Schema = {
   chat:{
     clearChat: '清空会话',
     clearChatConfirm: '是否清空会话?',
+    copy: '复制',
+    copyCode: '复制代码',
+    deleteMessage: '删除消息',
+    deleteMessageConfirm: '是否删除消息?',
     stopResponding: '停止响应',
     stopRespondingConfirm: '确定停止响应吗？',
     placeholder: '来说点什么吧...（Shift + Enter = 换行，"/" 触发提示词）',
     placeholderMobile: '来说点什么...',
+    preview: '预览',
+    showRawText: '显示原始文本',
+    turnOnContext: '已开启上下文对话',
+    turnOffContext: '已关闭上下文对话'
   },
   common: {
     action: '操作',
@@ -52,6 +60,7 @@ const local: App.I18n.Schema = {
     update: '更新',
     updateSuccess: '更新成功',
     userCenter: '个人中心',
+    wrong: '好像出错了，请稍后再试。',
     yesOrNo: {
       yes: '是',
       no: '否'

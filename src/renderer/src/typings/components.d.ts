@@ -8,12 +8,17 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     AppProvider: typeof import('./../components/common/app-provider.vue')['default']
+    Avatar: typeof import('./../components/Message/Avatar.vue')['default']
+    BasicButton: typeof import('./../components/common/basic-button.vue')['default']
     BetterScroll: typeof import('./../components/custom/better-scroll.vue')['default']
+    Button: typeof import('./../components/common/button.vue')['default']
     ButtonIcon: typeof import('./../components/custom/button-icon.vue')['default']
+    Common: typeof import('./../components/common/index.vue')['default']
     CountTo: typeof import('./../components/custom/count-to.vue')['default']
     DarkModeContainer: typeof import('./../components/common/dark-mode-container.vue')['default']
     ExceptionBase: typeof import('./../components/common/exception-base.vue')['default']
     FullScreen: typeof import('./../components/common/full-screen.vue')['default']
+    HoverButton: typeof import('./../components/common/hover-button.vue')['default']
     IconAntDesignEnterOutlined: typeof import('~icons/ant-design/enter-outlined')['default']
     IconAntDesignReloadOutlined: typeof import('~icons/ant-design/reload-outlined')['default']
     IconGridiconsFullscreen: typeof import('~icons/gridicons/fullscreen')['default']
@@ -27,6 +32,7 @@ declare module 'vue' {
     LangSwitch: typeof import('./../components/common/lang-switch.vue')['default']
     LookForward: typeof import('./../components/custom/look-forward.vue')['default']
     MenuToggler: typeof import('./../components/common/menu-toggler.vue')['default']
+    Message: typeof import('./../components/Message/index.vue')['default']
     NAutoComplete: typeof import('naive-ui')['NAutoComplete']
     NBreadcrumb: typeof import('naive-ui')['NBreadcrumb']
     NBreadcrumbItem: typeof import('naive-ui')['NBreadcrumbItem']
@@ -72,7 +78,9 @@ declare module 'vue' {
     SystemLogo: typeof import('./../components/common/system-logo.vue')['default']
     TableColumnSetting: typeof import('./../components/advanced/table-column-setting.vue')['default']
     TableHeaderOperation: typeof import('./../components/advanced/table-header-operation.vue')['default']
+    Text: typeof import('./../components/Message/Text.vue')['default']
     ThemeSchemaSwitch: typeof import('./../components/common/theme-schema-switch.vue')['default']
+    UserAvatar: typeof import('./../components/common/user-avatar.vue')['default']
     WaveBg: typeof import('./../components/custom/wave-bg.vue')['default']
   }
 }

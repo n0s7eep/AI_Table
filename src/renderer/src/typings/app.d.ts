@@ -297,10 +297,18 @@ declare namespace App {
       chat: {
         clearChat: string;
         clearChatConfirm: string;
+        copy: string;
+        copyCode: string;
+        deleteMessage: string;
+        deleteMessageConfirm: string;
         stopResponding: string;
         stopRespondingConfirm: string;
         placeholder: string;
         placeholderMobile: string;
+        preview: string;
+        showRawText: string;
+        turnOnContext: string;
+        turnOffContext: string;
       };
       common: {
         action: string;
@@ -340,6 +348,7 @@ declare namespace App {
         update: string;
         updateSuccess: string;
         userCenter: string;
+        wrong: string;
         yesOrNo: {
           yes: string;
           no: string;

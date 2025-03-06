@@ -32,7 +32,7 @@ const handleAgentClick = async (agent: Agent) => {
     const result = await window.electron.ipcRenderer.invoke('create-chat-room', agent.type);
     if (result.success) {
       routerPushByKey("creation_chat", {
-        query: { id: result.roomId }, params:{id:result.roomId}
+         params:{id:result.roomId}
       });
     } else {
       message.error(result.error || '创建聊天室失败');

@@ -9,10 +9,18 @@ const local: App.I18n.Schema = {
   chat:{
     clearChat: 'Clear Chat',
     clearChatConfirm: 'Are you sure to clear this chat?',
+    copy: 'Copy',
+    copyCode: 'Copy Code',
+    deleteMessage: 'Delete Message',
+    deleteMessageConfirm: 'Are you sure to delete this message?',
     stopResponding: '停止响应',
     stopRespondingConfirm: '确定停止响应吗？',
     placeholder: 'Ask me anything...(Shift + Enter = line break, "/" to trigger prompts)',
     placeholderMobile: 'Ask me anything...',
+    preview: 'Preview',
+    showRawText: 'Show Raw Text',
+    turnOnContext: 'Context chat enabled',
+    turnOffContext: 'Context chat disabled'
   },
   common: {
     action: 'Action',
@@ -52,6 +60,7 @@ const local: App.I18n.Schema = {
     update: 'Update',
     updateSuccess: 'Update Success',
     userCenter: 'User Center',
+    wrong: 'Something went wrong, please try again later.',
     yesOrNo: {
       yes: 'Yes',
       no: 'No'
