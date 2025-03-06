@@ -62,6 +62,19 @@ export const startHealthCheck = () => {
   ipcMain.handle('get-service-health', () => {
     return isHealthy ? 'healthy' : 'unhealthy'
   })
+
+  // 注册获取agent列表的处理程序
+  ipcMain.handle('get-agents', async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/agents', {
+        timeout: 5000
+      })
+      return response.data
+    } catch (error) {
+      console.error('获取agent列表失败:', error)
+      return []
+    }
+  })
 }
 
 export const stopHealthCheck = () => {
