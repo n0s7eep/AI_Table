@@ -1,200 +1,182 @@
 import { defineStore } from 'pinia'
-import { defaultState, getLocalState, setLocalState } from './helper'
+import { setLocalState } from './helper'
 import { router } from '@/router'
-import { v4 as uuidv4 } from 'uuid';
+import { computed, ref } from 'vue'
+import { SetupStoreId } from '@renderer/enum'
+import { useBoolean } from '@aitable/hooks'
 
-export const useChatStore = defineStore('chat-store', {
-  state: (): Chat.ChatState => getLocalState(),
+export const useChatStore = defineStore(SetupStoreId.Chat, () => {
+  const active = ref<string | null>(null)
+  const usingContext = useBoolean(true)
+  const history = ref<Chat.History[]>([])
+  const chat = ref<{ uuid: string; data: Chat.Chat[] }[]>([])
 
-  getters: {
-    getChatHistoryByCurrentActive(state: Chat.ChatState) {
-      const index = state.history.findIndex(item => item.uuid === state.active)
-      if (index !== -1)
-        return state.history[index]
-      return null
-    },
+  const getChatHistoryByCurrentActive = computed(() => {
+    const index = history.value.findIndex(item => item.uuid === active.value)
+    if (index !== -1)
+      return history.value[index]
+    return null
+  })
 
-    getChatByUuid(state: Chat.ChatState) {
-      return (uuid?: string) => {
-        if (uuid)
-          return state.chat.find(item => item.uuid === uuid)?.data ?? []
-        return state.chat.find(item => item.uuid === state.active)?.data ?? []
+  const getChatByUuid = (uuid?: string) => {
+    if (uuid)
+      return chat.value.find(item => item.uuid === uuid)?.data ?? []
+    return chat.value.find(item => item.uuid === active.value)?.data ?? []
+  }
+
+  const setUsingContext = (context: boolean) => {
+    usingContext.setBool(context)
+    recordState()
+  }
+
+  const addHistory = (historyData: Chat.History, chatData: Chat.Chat[] = []) => {
+    history.value.unshift(historyData)
+    chat.value.unshift({ uuid: historyData.uuid, data: chatData })
+    active.value = historyData.uuid
+    reloadRoute(historyData.uuid)
+  }
+
+  const updateHistory = (uuid: string, edit: Partial<Chat.History>) => {
+    const index = history.value.findIndex(item => item.uuid === uuid)
+    if (index !== -1) {
+      history.value[index] = { ...history.value[index], ...edit }
+      recordState()
+    }
+  }
+
+  const deleteHistory = async (index: number) => {
+    history.value.splice(index, 1)
+    chat.value.splice(index, 1)
+
+    if (history.value.length === 0) {
+      active.value = null
+      reloadRoute()
+      return
+    }
+
+    if (index > 0 && index <= history.value.length) {
+      const uuid = history.value[index - 1].uuid
+      active.value = uuid
+      reloadRoute(uuid)
+      return
+    }
+
+    if (index === 0) {
+      if (history.value.length > 0) {
+        const uuid = history.value[0].uuid
+        active.value = uuid
+        reloadRoute(uuid)
       }
-    },
-  },
+    }
 
-  actions: {
-    setUsingContext(context: boolean) {
-      this.usingContext = context
-      this.recordState()
-    },
+    if (index > history.value.length) {
+      const uuid = history.value[history.value.length - 1].uuid
+      active.value = uuid
+      reloadRoute(uuid)
+    }
+  }
 
-    addHistory(history: Chat.History, chatData: Chat.Chat[] = []) {
-      this.history.unshift(history)
-      this.chat.unshift({ uuid: history.uuid, data: chatData })
-      this.active = history.uuid
-      this.reloadRoute(history.uuid)
-    },
+  const setActive = async (uuid: string) => {
+    active.value = uuid
+    return await reloadRoute(uuid)
+  }
 
-    updateHistory(uuid: string, edit: Partial<Chat.History>) {
-      const index = this.history.findIndex(item => item.uuid === uuid)
-      if (index !== -1) {
-        this.history[index] = { ...this.history[index], ...edit }
-        this.recordState()
-      }
-    },
+  const getChatByUuidAndIndex = (uuid: string, index: number) => {
+    const chatIndex = chat.value.findIndex(item => item.uuid === uuid)
+    if (chatIndex !== -1)
+      return chat.value[chatIndex].data[index]
+    return null
+  }
 
-    async deleteHistory(index: number) {
-      this.history.splice(index, 1)
-      this.chat.splice(index, 1)
+  const addChatByUuid = (uuid: string, chatData: Chat.Chat) => {
+    const index = chat.value.findIndex(item => item.uuid === uuid)
+    if (index !== -1) {
+      chat.value[index].data.push(chatData)
+      if (history.value[index].title === 'New Chat')
+        history.value[index].title = chatData.text
+      recordState()
+    } else {
+      history.value.push({ uuid, title: chatData.text, isEdit: false })
+      chat.value.push({ uuid, data: [chatData] })
+      active.value = uuid
+      recordState()
+    }
+  }
 
-      if (this.history.length === 0) {
-        this.active = null
-        this.reloadRoute()
-        return
-      }
+  const updateChatByUuid = (uuid: string, index: number, chatData: Chat.Chat) => {
+    const chatIndex = chat.value.findIndex(item => item.uuid === uuid)
+    if (chatIndex !== -1) {
+      chat.value[chatIndex].data[index] = chatData
+      recordState()
+    }
+  }
 
-      if (index > 0 && index <= this.history.length) {
-        const uuid = this.history[index - 1].uuid
-        this.active = uuid
-        this.reloadRoute(uuid)
-        return
-      }
+  const updateChatSomeByUuid = (uuid: string, index: number, chatData: Partial<Chat.Chat>) => {
+    const chatIndex = chat.value.findIndex(item => item.uuid === uuid)
+    if (chatIndex !== -1) {
+      chat.value[chatIndex].data[index] = { ...chat.value[chatIndex].data[index], ...chatData }
+      recordState()
+    }
+  }
 
-      if (index === 0) {
-        if (this.history.length > 0) {
-          const uuid = this.history[0].uuid
-          this.active = uuid
-          this.reloadRoute(uuid)
-        }
-      }
+  const deleteChatByUuid = (uuid: string, index: number) => {
+    const chatIndex = chat.value.findIndex(item => item.uuid === uuid)
+    if (chatIndex !== -1) {
+      chat.value[chatIndex].data.splice(index, 1)
+      recordState()
+    }
+  }
 
-      if (index > this.history.length) {
-        const uuid = this.history[this.history.length - 1].uuid
-        this.active = uuid
-        this.reloadRoute(uuid)
-      }
-    },
+  const clearChatByUuid = (uuid: string) => {
+    const index = chat.value.findIndex(item => item.uuid === uuid)
+    if (index !== -1) {
+      chat.value[index].data = []
+      recordState()
+    }
+  }
 
-    async setActive(uuid: string) {
-      this.active = uuid
-      return await this.reloadRoute(uuid)
-    },
+  const clearHistory = () => {
+    active.value = null
+    usingContext.setTrue()
+    history.value = []
+    chat.value = []
+    recordState()
+  }
 
-    getChatByUuidAndIndex(uuid: string, index: number) {
-      if (!uuid || uuid.trim() === '') {
-        if (this.chat.length)
-          return this.chat[0].data[index]
-        return null
-      }
-      const chatIndex = this.chat.findIndex(item => item.uuid === uuid)
-      if (chatIndex !== -1)
-        return this.chat[chatIndex].data[index]
-      return null
-    },
+  const reloadRoute = async (uuid?: string) => {
+    recordState()
+    await router.push({ name: 'Chat', params: { uuid } })
+  }
 
-    addChatByUuid(uuid: string, chat: Chat.Chat) {
-      if (!uuid || uuid.trim() === '') {
-        if (this.history.length === 0) {
-          const uuid = uuidv4();
-          this.history.push({ uuid, title: chat.text, isEdit: false })
-          this.chat.push({ uuid, data: [chat] })
-          this.active = uuid
-          this.recordState()
-        }
-        else {
-          this.chat[0].data.push(chat)
-          if (this.history[0].title === 'New Chat')
-            this.history[0].title = chat.text
-          this.recordState()
-        }
-      }
+  const recordState = () => {
+    setLocalState({
+      active: active.value,
+      usingContext: usingContext.bool.value,
+      history: history.value,
+      chat: chat.value
+    })
+  }
 
-      const index = this.chat.findIndex(item => item.uuid === uuid)
-      if (index !== -1) {
-        this.chat[index].data.push(chat)
-        if (this.history[index].title === 'New Chat')
-          this.history[index].title = chat.text
-        this.recordState()
-      }
-    },
-
-    updateChatByUuid(uuid: string, index: number, chat: Chat.Chat) {
-      if (!uuid || uuid.trim() === '') {
-        if (this.chat.length) {
-          this.chat[0].data[index] = chat
-          this.recordState()
-        }
-        return
-      }
-
-      const chatIndex = this.chat.findIndex(item => item.uuid === uuid)
-      if (chatIndex !== -1) {
-        this.chat[chatIndex].data[index] = chat
-        this.recordState()
-      }
-    },
-
-    updateChatSomeByUuid(uuid: string, index: number, chat: Partial<Chat.Chat>) {
-      if (!uuid || uuid.trim() === '') {
-        if (this.chat.length) {
-          this.chat[0].data[index] = { ...this.chat[0].data[index], ...chat }
-          this.recordState()
-        }
-        return
-      }
-
-      const chatIndex = this.chat.findIndex(item => item.uuid === uuid)
-      if (chatIndex !== -1) {
-        this.chat[chatIndex].data[index] = { ...this.chat[chatIndex].data[index], ...chat }
-        this.recordState()
-      }
-    },
-
-    deleteChatByUuid(uuid: string, index: number) {
-      if (!uuid || uuid.trim() === '') {
-        if (this.chat.length) {
-          this.chat[0].data.splice(index, 1)
-          this.recordState()
-        }
-        return
-      }
-
-      const chatIndex = this.chat.findIndex(item => item.uuid === uuid)
-      if (chatIndex !== -1) {
-        this.chat[chatIndex].data.splice(index, 1)
-        this.recordState()
-      }
-    },
-
-    clearChatByUuid(uuid: string) {
-      if (!uuid || uuid.trim() === '') {
-        if (this.chat.length) {
-          this.chat[0].data = []
-          this.recordState()
-        }
-        return
-      }
-
-      const index = this.chat.findIndex(item => item.uuid === uuid)
-      if (index !== -1) {
-        this.chat[index].data = []
-        this.recordState()
-      }
-    },
-
-    clearHistory() {
-      this.$state = { ...defaultState() }
-      this.recordState()
-    },
-
-    async reloadRoute(uuid?: string) {
-      this.recordState()
-      await router.push({ name: 'Chat', params: { uuid } })
-    },
-
-    recordState() {
-      setLocalState(this.$state)
-    },
-  },
+  return {
+    active,
+    usingContext,
+    history,
+    chat,
+    getChatHistoryByCurrentActive,
+    getChatByUuid,
+    setUsingContext,
+    addHistory,
+    updateHistory,
+    deleteHistory,
+    setActive,
+    getChatByUuidAndIndex,
+    addChatByUuid,
+    updateChatByUuid,
+    updateChatSomeByUuid,
+    deleteChatByUuid,
+    clearChatByUuid,
+    clearHistory,
+    reloadRoute,
+    recordState
+  }
 })

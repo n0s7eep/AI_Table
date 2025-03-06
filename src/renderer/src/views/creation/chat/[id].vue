@@ -467,7 +467,7 @@ onMounted(() => {
                   <template #icon>
                     <SvgIcon icon="ri:stop-circle-line" />
                   </template>
-                  {{ $t('common.stopResponding') }}
+                  {{ $t('chat.stopResponding') }}
                 </NButton>
               </div>
             </div>
