@@ -56,7 +56,9 @@ const checkHealth = async () => {
 
 export const startHealthCheck = () => {
   // 启动健康检查
-  checkHealth()
+  if(!healthCheckTimer){
+    healthCheckTimer = setInterval(checkHealth, HEALTH_CHECK_INTERVAL.UNHEALTHY)
+  }
 
   // 注册IPC处理程序
   ipcMain.handle('get-service-health', () => {

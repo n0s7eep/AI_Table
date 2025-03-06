@@ -6,6 +6,14 @@ const local: App.I18n.Schema = {
     updateConfirm: '立即刷新',
     updateCancel: '稍后再说'
   },
+  chat:{
+    clearChat: '清空会话',
+    clearChatConfirm: '是否清空会话?',
+    stopResponding: '停止响应',
+    stopRespondingConfirm: '确定停止响应吗？',
+    placeholder: '来说点什么吧...（Shift + Enter = 换行，"/" 触发提示词）',
+    placeholderMobile: '来说点什么...',
+  },
   common: {
     action: '操作',
     add: '新增',

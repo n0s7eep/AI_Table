@@ -22,6 +22,8 @@ declare namespace StorageType {
     themeColor: string;
     /** The theme settings */
     themeSettings: App.Theme.ThemeSetting;
+
+    chatStorage: Chat.ChatState;
     /**
      * The override theme flags
      *

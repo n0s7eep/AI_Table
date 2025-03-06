@@ -294,6 +294,14 @@ declare namespace App {
         updateConfirm: string;
         updateCancel: string;
       };
+      chat: {
+        clearChat: string;
+        clearChatConfirm: string;
+        stopResponding: string;
+        stopRespondingConfirm: string;
+        placeholder: string;
+        placeholderMobile: string;
+      };
       common: {
         action: string;
         add: string;

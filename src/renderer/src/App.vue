@@ -5,6 +5,7 @@ import type { WatermarkProps } from 'naive-ui'
 import { useAppStore } from './store/modules/app'
 import { useThemeStore } from './store/modules/theme'
 import { naiveDateLocales, naiveLocales } from './locales/naive'
+import { IpcRendererEvent } from 'electron'
 
 defineOptions({
   name: 'App'
@@ -39,22 +40,9 @@ const watermarkProps = computed<WatermarkProps>(() => {
   }
 })
 
-const serviceStatus = ref('未知')
-const serviceMessage = ref('')
-
-onMounted(() => {
-  // 监听服务状态变化
-  window.electron.ipcRenderer.on('service-status-change', (status: 'healthy' | 'unhealthy') => {
-    appStore.setServiceStatus(status)
-  })
-})
 </script>
 
 <template>
-  <div class="service-status">
-    <p>服务状态: {{ serviceStatus }}</p>
-    <p>服务信息: {{ serviceMessage }}</p>
-  </div>
   <NConfigProvider
     :theme="naiveDarkTheme"
     :theme-overrides="themeStore.naiveTheme"

@@ -6,6 +6,14 @@ const local: App.I18n.Schema = {
     updateConfirm: 'Refresh immediately',
     updateCancel: 'Later'
   },
+  chat:{
+    clearChat: 'Clear Chat',
+    clearChatConfirm: 'Are you sure to clear this chat?',
+    stopResponding: '停止响应',
+    stopRespondingConfirm: '确定停止响应吗？',
+    placeholder: 'Ask me anything...(Shift + Enter = line break, "/" to trigger prompts)',
+    placeholderMobile: 'Ask me anything...',
+  },
   common: {
     action: 'Action',
     add: 'Add',
