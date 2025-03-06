@@ -63,18 +63,38 @@ export const startHealthCheck = () => {
     return isHealthy ? 'healthy' : 'unhealthy'
   })
 
-  // 注册获取agent列表的处理程序
+  // 健康检查
+  ipcMain.handle('check-health', async () => {
+    try {
+      const response = await axios.get('http://localhost:5000/api/health');
+      return response.data;
+    } catch (error) {
+      console.error('健康检查失败:', error);
+      return { status: 'unhealthy' };
+    }
+  });
+
+  // 获取所有agents
   ipcMain.handle('get-agents', async () => {
     try {
-      const response = await axios.get('http://localhost:5000/api/agents', {
-        timeout: 5000
-      })
-      return response.data
+      const response = await axios.get('http://localhost:5000/api/agents');
+      return response.data;
     } catch (error) {
-      console.error('获取agent列表失败:', error)
-      return []
+      console.error('获取agents列表失败:', error);
+      return [];
     }
-  })
+  });
+
+  // 获取指定类型的agent
+  ipcMain.handle('get-agent-by-type', async (_, type: string) => {
+    try {
+      const response = await axios.get(`http://localhost:5000/api/agents/${type}`);
+      return response.data;
+    } catch (error) {
+      console.error('获取指定agent失败:', error);
+      return null;
+    }
+  });
 }
 
 export const stopHealthCheck = () => {

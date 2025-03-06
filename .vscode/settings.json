@@ -22,6 +22,8 @@
   "i18n-ally.keystyle": "nested",
   "cSpell.words": [
     "metagpt",
-    "multiagent"
-  ]
+    "multiagent",
+    "uuidv"
+  ],
+  "deepscan.ignoreConfirmWarning": true
 }

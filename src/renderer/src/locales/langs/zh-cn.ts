@@ -167,6 +167,8 @@ const local: App.I18n.Schema = {
     creation: '创作',
     collaboration: '协作',
     management: '管理',
+    creation_chat: "创作聊天",
+    creation_home: "创作首页"
   },
   page: {
     login: {

@@ -51,11 +51,34 @@ export const generatedRoutes: GeneratedRoute[] = [
   {
     name: 'creation',
     path: '/creation',
-    component: 'layout.base$view.creation',
+    component: 'layout.base',
     meta: {
       title: 'creation',
-      i18nKey: 'route.creation'
-    }
+      i18nKey: 'route.creation',
+      order: 2
+    },
+    children: [
+      {
+        name: 'creation_chat',
+        path: '/creation/chat/:id',
+        component: 'view.creation_chat',
+        meta: {
+          title: 'creation_chat',
+          hideInMenu: true,
+          i18nKey: 'route.creation_chat'
+        }
+      },
+      {
+        name: 'creation_home',
+        path: '/creation/home',
+        component: 'view.creation_home',
+        meta: {
+          title: 'creation_home',
+          i18nKey: 'route.creation_home'
+        }
+      }
+    ],
+    props: true
   },
   {
     name: 'execution',
@@ -63,7 +86,8 @@ export const generatedRoutes: GeneratedRoute[] = [
     component: 'layout.base$view.execution',
     meta: {
       title: 'execution',
-      i18nKey: 'route.execution'
+      i18nKey: 'route.execution',
+      order: 3
     }
   },
   {
@@ -108,7 +132,8 @@ export const generatedRoutes: GeneratedRoute[] = [
     component: 'layout.base$view.management',
     meta: {
       title: 'management',
-      i18nKey: 'route.management'
+      i18nKey: 'route.management',
+      order: 4
     }
   }
 ];

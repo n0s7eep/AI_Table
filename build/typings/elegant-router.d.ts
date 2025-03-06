@@ -22,6 +22,8 @@ declare module "@elegant-router/types" {
     "500": "/500";
     "collaboration": "/collaboration";
     "creation": "/creation";
+    "creation_chat": "/creation/chat/:id";
+    "creation_home": "/creation/home";
     "execution": "/execution";
     "home": "/home";
     "iframe-page": "/iframe-page/:url";
@@ -90,7 +92,8 @@ declare module "@elegant-router/types" {
     | "iframe-page"
     | "login"
     | "collaboration"
-    | "creation"
+    | "creation_chat"
+    | "creation_home"
     | "execution"
     | "home"
     | "management"

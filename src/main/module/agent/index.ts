@@ -1,6 +1,8 @@
 import { exec } from 'child_process'
 import { join } from 'path'
 import { startHealthCheck } from './health'
+import { ipcMain } from 'electron'
+import { chatRoomManager } from './chat_room'
 
 export const startAgentProcess = async (app) => {
   return new Promise<void>((resolve, reject) => {
@@ -98,4 +100,50 @@ export const startAgentProcess = async (app) => {
     // 延迟2秒后开始检查服务状态
     setTimeout(checkService, 2000)
   })
+}
+
+export function setupAgentIPC() {
+  // 创建聊天室
+  ipcMain.handle('create-chat-room', async (_, agentType: string) => {
+    try {
+      const roomId = chatRoomManager.createRoom(agentType);
+      return { success: true, roomId };
+    } catch (error) {
+      console.error('创建聊天室失败:', error);
+      return { success: false, error: '创建聊天室失败' };
+    }
+  });
+
+  // 获取聊天室信息
+  ipcMain.handle('get-chat-room', async (_, roomId: string) => {
+    try {
+      const room = await chatRoomManager.getRoom(roomId);
+      return { success: true, room };
+    } catch (error) {
+      console.error('获取聊天室信息失败:', error);
+      return { success: false, error: '获取聊天室信息失败' };
+    }
+  });
+
+  // 发送消息
+  ipcMain.handle('send-message', async (_, roomId: string, message: string) => {
+    try {
+      const response = await chatRoomManager.sendMessage(roomId, message);
+      return { success: true, response };
+    } catch (error) {
+      console.error('发送消息失败:', error);
+      return { success: false, error: '发送消息失败' };
+    }
+  });
+
+  // 删除聊天室
+  ipcMain.handle('delete-chat-room', async (_, roomId: string) => {
+    try {
+      const success = chatRoomManager.deleteRoom(roomId);
+      return { success };
+    } catch (error) {
+      console.error('删除聊天室失败:', error);
+      return { success: false, error: '删除聊天室失败' };
+    }
+  });
 }

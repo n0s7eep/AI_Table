@@ -167,6 +167,8 @@ const local: App.I18n.Schema = {
     creation: 'Creation',
     collaboration: 'Collaboration',
     management: 'Management',
+    creation_chat: "Creation Chat",
+    creation_home: "Creation Home"
   },
   page: {
     login: {
