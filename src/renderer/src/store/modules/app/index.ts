@@ -10,6 +10,7 @@ import { localStg } from '@/utils/storage';
 import { useRouteStore } from '../route';
 import { useTabStore } from '../tab';
 import { useThemeStore } from '../theme';
+import { checkHealth } from '@/service/api/health';
 
 export const useAppStore = defineStore(SetupStoreId.App, () => {
   const themeStore = useThemeStore();
@@ -80,8 +81,30 @@ export const useAppStore = defineStore(SetupStoreId.App, () => {
     useTitle(documentTitle);
   }
 
+  const serviceStatus = ref<'healthy' | 'unhealthy'>('unhealthy');
+
+  const setServiceStatus = (status: 'healthy' | 'unhealthy') => {
+    serviceStatus.value = status;
+  };
+
+  /** 同步服务健康状态 */
+  async function syncServiceStatus() {
+    checkHealth().then(result => {
+      setServiceStatus(result.status);
+      if (result.success) {
+        console.log('同步服务健康状态: 健康');
+      } else {
+        console.error('同步服务健康状态失败:', result.error);
+      }
+    });
+  }
+
   function init() {
     setDayjsLocale(locale.value);
+    // 启动时同步服务健康状态
+    syncServiceStatus().catch(error => {
+      console.error('初始化服务健康状态失败:', error);
+    });
   }
 
   // watch store
@@ -164,6 +187,9 @@ export const useAppStore = defineStore(SetupStoreId.App, () => {
     toggleSiderCollapse,
     mixSiderFixed,
     setMixSiderFixed,
-    toggleMixSiderFixed
+    toggleMixSiderFixed,
+    serviceStatus,
+    setServiceStatus,
+    syncServiceStatus
   };
 });

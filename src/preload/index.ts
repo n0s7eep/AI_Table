@@ -3,11 +3,6 @@ import { electronAPI } from '@electron-toolkit/preload'
 
 // Custom APIs for renderer
 const api = {
-  serviceHealth: {
-    onHealthUpdate: (callback: (data: any) => void) => {
-      ipcRenderer.on('service-health', (event, data) => callback(data))
-    }
-  }
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

@@ -19,5 +19,9 @@
     "src/renderer/src/locales/langs",
   ],
   "i18n-ally.sourceLanguage": "zh-cn",
-  "i18n-ally.keystyle": "nested"
+  "i18n-ally.keystyle": "nested",
+  "cSpell.words": [
+    "metagpt",
+    "multiagent"
+  ]
 }

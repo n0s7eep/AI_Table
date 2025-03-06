@@ -43,15 +43,9 @@ const serviceStatus = ref('未知')
 const serviceMessage = ref('')
 
 onMounted(() => {
-  // 监听服务健康状态更新
-  window.api.serviceHealth.onHealthUpdate((data) => {
-    if (data.status === 'error') {
-      serviceStatus.value = '错误'
-      serviceMessage.value = data.message
-    } else {
-      serviceStatus.value = data.status
-      serviceMessage.value = data.message
-    }
+  // 监听服务状态变化
+  window.electron.ipcRenderer.on('service-status-change', (status: 'healthy' | 'unhealthy') => {
+    appStore.setServiceStatus(status)
   })
 })
 </script>
